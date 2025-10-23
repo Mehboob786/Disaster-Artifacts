@@ -4,7 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
-
+/disaster-artifact-frontend/node_modules
+/studio/node_modules
+/studio/.sanity
 # testing
 /coverage
 
