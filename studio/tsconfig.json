@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "jsx": "react-jsx", // 👈 changed from "preserve" for React
+    "incremental": true,
+    "noEmit": true // 👈 prevents TypeScript from writing .js files (solves overwrite error)
+  },
+  "include": [
+    "src",
+    "schemas",
+    "sanity.config.ts",
+    "sanity.cli.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
