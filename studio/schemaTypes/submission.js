@@ -19,5 +19,13 @@ export default {
         { name: 'contact', type: 'string' },
         { name: 'tags', type: 'array', of: [{ type: 'string' }] },
         { name: 'approved', type: 'boolean', title: 'Approved', initialValue: false },
+        {
+            name: 'createdAt',
+            title: 'Created At',
+            type: 'datetime',
+            readOnly: true,
+            initialValue: () => new Date().toISOString(),
+        }
+
     ],
 }
