@@ -1,22 +1,23 @@
-
-
-
 export default {
     name: 'submission',
-    title: 'Submission',
     type: 'document',
+    title: 'Submission',
     fields: [
-        { name: 'title', title: 'Title', type: 'string' },
-        { name: 'description', title: 'Description', type: 'text' },
-        { name: 'artifactType', title: 'Artifact Type', type: 'string', options: { list: ['photo', 'video', 'document'] } },
-        { name: 'media', title: 'Media', type: 'file' },
-        { name: 'locationName', title: 'Location Name', type: 'string' },
-        { name: 'location', title: 'Location (Lat/Long)', type: 'geopoint' },
-        { name: 'eventDate', title: 'Date / Time of Event', type: 'datetime' },
-        { name: 'submitterName', title: 'Submitter Name', type: 'string' },
-        { name: 'contact', title: 'Contact (email/phone)', type: 'string' },
-        { name: 'tags', title: 'Tags', type: 'array', of: [{ type: 'string' }] },
-        { name: 'approved', title: 'Approved', type: 'boolean', initialValue: false },
-        { name: 'createdAt', title: 'Created At', type: 'datetime', readOnly: true }
-    ]
+        { name: 'title', type: 'string' },
+        { name: 'description', type: 'text' },
+        {
+            name: 'media',
+            title: 'Media',
+            type: 'array',
+            of: [{ type: 'file' }],
+        },
+        { name: 'artifactType', type: 'string' },
+        { name: 'locationName', type: 'string' },
+        { name: 'location', type: 'geopoint' },
+        { name: 'eventDate', type: 'datetime' },
+        { name: 'submitterName', type: 'string' },
+        { name: 'contact', type: 'string' },
+        { name: 'tags', type: 'array', of: [{ type: 'string' }] },
+        { name: 'approved', type: 'boolean', title: 'Approved', initialValue: false },
+    ],
 }
