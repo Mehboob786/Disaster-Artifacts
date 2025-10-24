@@ -2,9 +2,9 @@ import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
 const client = createClient({
-  projectId: process.env.REACT_APP_SANITY_PROJECT_ID || 'auustk9a', 
-  dataset: process.env.REACT_APP_SANITY_DATASET || 'production',
-  apiVersion: '2025-10-22', // hardcoded date string
+  projectId: process.env.REACT_APP_SANITY_PROJECT_ID , 
+  dataset: process.env.REACT_APP_SANITY_DATASET,
+  apiVersion: '2025-10-22', 
   useCdn: false,
   token: process.env.REACT_APP_SANITY_TOKEN,
 })
