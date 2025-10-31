@@ -28,6 +28,39 @@
 .App-link {
   color: #61dafb;
 }
+/* 🌈 Animated Gradient Background */
+.animated-bg {
+  background: linear-gradient(-45deg, #cbefff, #f6f9fc, #def7ff, #e0fbff);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+}
+
+/* Smooth gradient flow */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Optional: Slight fade-in for the whole app */
+body {
+  animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 @keyframes App-logo-spin {
   from {
