@@ -159,14 +159,14 @@ export default function UploadForm() {
       style={{
         minHeight: "85vh",
         background:
-          "linear-gradient(135deg, #7fe6f3ff 0%, #66dcf1ff 50%, rgba(48, 142, 244, 1) 100%)",
+          "linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 50%, #f3e5f5 100%)",
       }}
     >
       <Card
         className="p-4 p-md-5 shadow-lg border-0"
         style={{
           borderRadius: "1.5rem",
-          backgroundColor: "hsla(183, 74%, 69%, 0.95)",
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
           maxWidth: "700px",
           width: "100%",
         }}
