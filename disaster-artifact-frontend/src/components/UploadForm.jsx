@@ -121,17 +121,27 @@ export default function UploadForm() {
         }
       }
 
+      // ✅ Detect artifact type based on first uploaded file
+      let detectedType = "document";
+      if (files.length > 0) {
+        const firstFile = files[0];
+        if (firstFile.type.startsWith("image/")) detectedType = "image";
+        else if (firstFile.type.startsWith("video/")) detectedType = "video";
+        else detectedType = "document";
+      }
+
       const doc = {
         _type: "submission",
         title: data.title,
         description: data.description,
+        artifactType: detectedType, // ✅ auto-set
         media: mediaRefs,
         locationName: data.locationName || cityName,
         location: data.location
           ? {
-              lat: parseFloat(data.location.split(",")[0]),
-              lng: parseFloat(data.location.split(",")[1]),
-            }
+            lat: parseFloat(data.location.split(",")[0]),
+            lng: parseFloat(data.location.split(",")[1]),
+          }
           : undefined,
         eventDate: data.eventDate || new Date().toISOString(),
         submitterName: data.submitterName,
