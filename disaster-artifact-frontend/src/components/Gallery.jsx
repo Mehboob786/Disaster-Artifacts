@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardGroup, Button, Spinner, Form, Row, Col } from 'react-bootstrap';
+import { Card, Button, Spinner, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import client, { urlFor } from '../sanityClient';
 
@@ -63,19 +63,16 @@ export default function Gallery() {
       ) : filteredItems.length === 0 ? (
         <p className="text-center text-muted">No submissions found.</p>
       ) : (
-        <CardGroup className="flex-wrap justify-content-center">
+        <Row className="justify-content-center">
           {filteredItems.map(it => {
             const ref = it.media?.asset?._ref;
             let mediaContent = null;
             let fileUrl = '';
 
-            // 🖼️ Image
             if (ref?.startsWith('image-')) {
               fileUrl = urlFor(it.media.asset).width(600).url();
               mediaContent = <Card.Img variant="top" src={fileUrl} alt={it.title} />;
-            }
-            // 🎥 Video
-            else if (it.artifactType === 'video') {
+            } else if (it.artifactType === 'video') {
               const fileId = ref?.replace('file-', '').replace(/-[a-z0-9]+$/, '');
               fileUrl = `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${fileId}.mp4`;
               mediaContent = (
@@ -83,9 +80,7 @@ export default function Gallery() {
                   <source src={fileUrl} type="video/mp4" />
                 </video>
               );
-            }
-            // 📄 File
-            else if (ref?.startsWith('file-')) {
+            } else if (ref?.startsWith('file-')) {
               const ext = ref.split('-').pop();
               const fileId = ref.replace('file-', '').replace(`-${ext}`, '');
               fileUrl = `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${fileId}.${ext}`;
@@ -97,61 +92,63 @@ export default function Gallery() {
             }
 
             return (
-              <Card
-                key={it._id}
-                className="m-3 shadow-sm"
-                style={{ width: '22rem', cursor: 'pointer', borderRadius: '12px' }}
-                onClick={() => navigate(`/artifact/${it._id}`)}
-              >
-                {mediaContent}
-                <Card.Body>
-                  <Card.Title>{it.title}</Card.Title>
-                  <Card.Text className="text-muted" style={{ fontSize: '0.9rem' }}>
-                    {it.description?.length > 120
-                      ? it.description.slice(0, 120) + '...'
-                      : it.description}
-                  </Card.Text>
-                  <div className="d-flex justify-content-between mt-3">
-                    {it.locationName && (
-                      <small className="text-muted">📍 {it.locationName}</small>
-                    )}
-                    {it.eventDate && (
-                      <small className="text-muted">
-                        🗓️ {new Date(it.eventDate).toLocaleDateString()}
+              <Col key={it._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
+                <Card
+                  className="shadow-sm h-100"
+                  style={{ borderRadius: '12px', cursor: 'pointer' }}
+                  onClick={() => navigate(`/artifact/${it._id}`)}
+                >
+                  {mediaContent}
+                  <Card.Body>
+                    <Card.Title>{it.title}</Card.Title>
+                    <Card.Text className="text-muted" style={{ fontSize: '0.9rem' }}>
+                      {it.description?.length > 120
+                        ? it.description.slice(0, 120) + '...'
+                        : it.description}
+                    </Card.Text>
+                    <div className="d-flex justify-content-between mt-3">
+                      {it.locationName && (
+                        <small className="text-muted">📍 {it.locationName}</small>
+                      )}
+                      {it.eventDate && (
+                        <small className="text-muted">
+                          🗓️ {new Date(it.eventDate).toLocaleDateString()}
+                        </small>
+                      )}
+                    </div>
+                  </Card.Body>
+                  <Card.Footer className="d-flex align-items-center justify-content-between bg-white">
+                    <div className="d-flex align-items-center">
+                      {it.submitter?.avatar ? (
+                        <img
+                          src={it.submitter.avatar}
+                          alt={it.submitter.name}
+                          className="rounded-circle me-2"
+                          style={{ width: 32, height: 32, objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div
+                          className="bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                          style={{ width: 32, height: 32 }}
+                        >
+                          👤
+                        </div>
+                      )}
+                      <small className="fw-semibold text-dark">
+                        {it.submitter?.name || 'Anonymous'}
                       </small>
-                    )}
-                  </div>
-                </Card.Body>
-                <Card.Footer className="d-flex align-items-center justify-content-between bg-white">
-                  <div className="d-flex align-items-center">
-                    {it.submitter?.avatar ? (
-                      <img
-                        src={it.submitter.avatar}
-                        alt={it.submitter.name}
-                        className="rounded-circle me-2"
-                        style={{ width: 32, height: 32, objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div
-                        className="bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
-                        style={{ width: 32, height: 32 }}
-                      >
-                        👤
-                      </div>
-                    )}
-                    <small className="fw-semibold text-dark">
-                      {it.submitter?.name || 'Anonymous'}
-                    </small>
-                  </div>
-                  <Button variant="outline-primary" size="sm">
-                    View
-                  </Button>
-                </Card.Footer>
-              </Card>
+                    </div>
+                    <Button variant="outline-primary" size="sm">
+                      View
+                    </Button>
+                  </Card.Footer>
+                </Card>
+              </Col>
             );
           })}
-        </CardGroup>
+        </Row>
       )}
+
 
       {/* 📜 Load More Button */}
       {visibleCount < items.length && (
