@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
-import client, { urlFor } from "../sanityClient";
+import client from "../sanityClient";
+import MediaPreview from "../components/MediaPreview";
 
 export default function ArtifactDetail() {
   const { id } = useParams();
@@ -29,7 +30,7 @@ export default function ArtifactDetail() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* 🔙 Back Link */}
+      {/* 🔙 Back Button */}
       <Link
         to={fromMap ? "/map" : "/"}
         className="text-blue-600 hover:underline mb-4 inline-block"
@@ -38,74 +39,10 @@ export default function ArtifactDetail() {
       </Link>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* 🎞️ Media Gallery */}
-        {Array.isArray(artifact.media) && artifact.media.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50">
-            {artifact.media.map((m, idx) => {
-              const ref = m?.asset?._ref;
-              if (!ref) return null;
+        {/* 🖼️ Media Gallery (using new component) */}
+        <MediaPreview media={artifact.media} />
 
-              // 🖼️ Image
-              if (ref.startsWith("image-")) {
-                const imageUrl = urlFor(m.asset).width(800).url();
-                return (
-                  <img
-                    key={idx}
-                    src={imageUrl}
-                    alt={artifact.title}
-                    className="rounded-lg object-cover w-full h-64 shadow-sm"
-                  />
-                );
-              }
-
-              // 🎥 Video
-              if (artifact.artifactType === "video" || ref.includes("mp4")) {
-                const fileId = ref
-                  .replace("file-", "")
-                  .replace(/-[a-z0-9]+$/, "");
-                const videoUrl = `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${fileId}.mp4`;
-                return (
-                  <video
-                    key={idx}
-                    src={videoUrl}
-                    controls
-                    className="rounded-lg w-full h-64 bg-black shadow-sm"
-                  />
-                );
-              }
-
-              // 📄 Other Files
-              const ext = ref.split("-").pop();
-              const fileId = ref.replace("file-", "").replace(`-${ext}`, "");
-              const fileUrl = `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${fileId}.${ext}`;
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center justify-center h-56 bg-gray-100 border rounded-lg"
-                >
-                  <p className="mb-2 text-gray-700 font-medium">
-                    📄 {ext?.toUpperCase()} File
-                  </p>
-                  <a
-                    href={fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                    download
-                  >
-                    ⬇️ Download File
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="p-5 text-center text-gray-500">
-            No media attached for this artifact.
-          </div>
-        )}
-
-        {/* 📘 Artifact Details */}
+        {/* 🧾 Artifact Details */}
         <div className="p-6 space-y-3">
           <h1 className="text-2xl font-semibold text-gray-800">
             {artifact.title}
