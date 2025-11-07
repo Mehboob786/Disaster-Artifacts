@@ -14,9 +14,10 @@ export default function Gallery() {
 
   useEffect(() => {
     const q = `*[_type=="submission" && approved==true] | order(_createdAt desc){
-      _id, title, description, media, artifactType, locationName, eventDate,
-      submitter->{name, avatar}
-    }`;
+  _id, title, description, media, artifactType, locationName, eventDate,
+  submitterName
+}`;
+
 
     client.fetch(q).then(setItems).catch(console.error).finally(() => setLoading(false));
   }, []);
@@ -135,7 +136,7 @@ export default function Gallery() {
                         </div>
                       )}
                       <small className="fw-semibold text-dark">
-                        {it.submitter?.name || 'Anonymous'}
+                        {it.submitterName || 'Anonymous'}
                       </small>
                     </div>
                     <Button variant="outline-primary" size="sm">
