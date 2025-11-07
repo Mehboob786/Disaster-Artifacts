@@ -40,12 +40,21 @@ export default function App() {
                 View Submissions
               </Button>
               <Button
+                variant="outline-info"
+                className="px-3 fw-semibold text-white"
+                onClick={() => navigate("/map")}
+              >
+                Map View
+              </Button>
+              <Button
                 variant="warning"
                 className="px-3 fw-semibold text-dark"
                 onClick={() => navigate("/upload")}
               >
                 + Add Submission
               </Button>
+              
+
             </Nav>
           </Navbar.Collapse>
         </Container>
