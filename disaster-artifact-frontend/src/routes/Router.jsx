@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Gallery from "../components/Gallery";
 import UploadForm from "../components/UploadForm";
-import ArtifactDetails from "../components/ArtifactDetail";
+import ArtifactDetails from '../components/ArtifactDetails.jsx';
 import MapView from "../components/MapView";
 
 export default function AppRouter() {

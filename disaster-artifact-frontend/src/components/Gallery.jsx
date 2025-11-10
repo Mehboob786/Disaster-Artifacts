@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Card, Button, Spinner, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import client from '../sanityClient';
-import getMediaUrl from './utils/getMediaUrl';
 
 export default function Gallery() {
   const [items, setItems] = useState([]);
@@ -71,45 +70,42 @@ export default function Gallery() {
       ) : (
         <Row className="justify-content-center">
           {filteredItems.map(it => {
-            let mediaContent;
-            // ...inside component map...
-            const media = it.media?.[0]; // primary media
-            const fileUrl = getMediaUrl(media, it.artifactType);
-            if (it.artifactType === 'image' && fileUrl) {
-              mediaContent = (
-                <Card.Img
-                  variant="top"
-                  src={fileUrl}
-                  alt={it.title}
-                  style={{ height: 200, objectFit: 'cover' }}
-                />
-              );
-            } else if (it.artifactType === 'video' && fileUrl) {
-              mediaContent = (
-                <video width="100%" height="200" controls style={{ objectFit: 'cover' }}>
-                  <source src={fileUrl} type="video/mp4" />
-                </video>
-              );
-            } else if (it.artifactType === 'document' && fileUrl) {
-              const ext = fileUrl.split('.').pop();
-              mediaContent = (
-                <div
-                  className="d-flex flex-column align-items-center justify-content-center bg-light text-muted"
-                  style={{ height: 200 }}
-                >
-                  📄 <a href={fileUrl} target="_blank" rel="noopener noreferrer">{ext.toUpperCase()} File</a>
-                </div>
-              );
+            const media = it.media?.[0];
+            let mediaContent = null;
+
+            if (media && media.asset && media.asset.url) {
+              const { url, mimeType } = media.asset;
+
+              if (mimeType?.startsWith("image/")) {
+                mediaContent = (
+                  <Card.Img
+                    variant="top"
+                    src={url}
+                    alt={it.title}
+                    style={{ height: 200, objectFit: "cover" }}
+                  />
+                );
+              } else {
+                mediaContent = (
+                  <div
+                    className="d-flex align-items-center justify-content-center bg-light text-muted"
+                    style={{ height: 200 }}
+                  >
+                    No image found
+                  </div>
+                );
+              }
             } else {
               mediaContent = (
                 <div
                   className="d-flex align-items-center justify-content-center bg-light text-muted"
                   style={{ height: 200 }}
                 >
-                  No Media Available
+                  No image found
                 </div>
               );
             }
+
 
 
 
