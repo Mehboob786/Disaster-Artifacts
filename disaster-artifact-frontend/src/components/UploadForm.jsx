@@ -135,6 +135,7 @@ export default function UploadForm() {
         title: data.title,
         description: data.description,
         artifactType: detectedType, // ✅ auto-set
+        disasterType: data.disasterType,
         media: mediaRefs,
         locationName: data.locationName || cityName,
         location: data.location
@@ -213,6 +214,22 @@ export default function UploadForm() {
               {...register("media")}
               required
             />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">🌪️ Disaster Type</Form.Label>
+            <Form.Select {...register("disasterType")} required>
+              <option value="">Select a disaster type</option>
+              <option value="flood">Flood</option>
+              <option value="earthquake">Earthquake</option>
+              <option value="tornado">Tornado</option>
+              <option value="hurricane_typhoon">Hurricane / Typhoon</option>
+              <option value="wildfire">Wildfire</option>
+              <option value="dust_storm">Dust Storm</option>
+              <option value="freeze">Freeze</option>
+              <option value="severe_storm">Severe Storm</option>
+              <option value="winter_storm">Winter Storm</option>
+            </Form.Select>
           </Form.Group>
 
           <Form.Label className="fw-semibold mt-3">
