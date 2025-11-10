@@ -100,16 +100,14 @@ export default function UploadForm() {
       const mediaRefs = [];
 
       for (const file of files) {
-        // choose upload type based on mime
-        const uploadType = file.type.startsWith('image/') ? 'image' : 'file';
 
-        const asset = await client.assets.upload(uploadType, file, {
+        const asset = await client.assets.upload("file", file, {
           filename: file.name,
         });
         mediaRefs.push({
           _key: crypto.randomUUID(),
-          _type: uploadType === 'image' ? 'image' : 'file',
-          asset: { _type: 'reference', _ref: asset._id },
+          _type: "file",
+          asset: { _type: "reference", _ref: asset._id },
         });
 
         if (file.type.startsWith("image/")) {

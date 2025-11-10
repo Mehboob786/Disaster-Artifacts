@@ -12,13 +12,12 @@ export default defineType({
       title: 'Media',
       type: 'array',
       of: [
-        { type: 'image' },
         { type: 'file' }
       ],
     },
     { name: 'artifactType', type: 'string' },
 
-    // ✅ NEW FIELD
+    
     {
       name: 'disasterType',
       title: 'Disaster Type',
