@@ -17,6 +17,7 @@ export default function ArtifactDetails() {
       title,
       description,
       eventDate,
+      contact,
       locationName,
       artifactType,
       submitterName,

@@ -27,6 +27,17 @@ export default function DetailsPage({ artifact }) {
                     <p><strong>Location:</strong> {locationName || "Unknown"}</p>
                     <p><strong>Date:</strong> {eventDate ? new Date(eventDate).toDateString() : "N/A"}</p>
                     <p><strong>Submitted by:</strong> {submitterName || "Anonymous"}</p>
+                    {artifact.contact && (
+                        <p>
+                            <strong>Email:</strong>{" "}
+                            <a
+                                href={`mailto:${artifact.contact}`}
+                                className="text-blue-600 hover:text-blue-800 underline"
+                            >
+                                {artifact.contact}
+                            </a>
+                        </p>
+                    )}
                 </div>
             </div>
             {/* 🖼️ Media Section */}
@@ -48,8 +59,22 @@ export default function DetailsPage({ artifact }) {
                             return (
                                 <div
                                     key={idx}
-                                    className="rounded-lg bg-white shadow-sm overflow-hidden flex flex-col"
+                                    className="rounded-lg bg-white shadow-sm overflow-hidden"
                                 >
+                                    {/* File info & download button */}
+                                    <div className="p-4 flex flex-col items-center">
+
+                                        <a
+                                            href={fileUrl}
+                                            download
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                                        >
+                                            ⬇️ Download {asset.extension?.toUpperCase() || "FILE"}
+                                        </a>
+                                    </div>
+
                                     {/* Media preview */}
                                     {isImage ? (
                                         <img
@@ -62,22 +87,6 @@ export default function DetailsPage({ artifact }) {
                                             No image preview
                                         </div>
                                     )}
-
-                                    {/* File info & download button */}
-                                    <div className="p-4 flex flex-col items-center">
-                                        <p className="text-sm text-gray-600 mb-2">
-                                            {asset.originalFilename || "Unnamed File"}
-                                        </p>
-                                        <a
-                                            href={fileUrl}
-                                            download
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                                        >
-                                            ⬇️ Download {asset.extension?.toUpperCase() || "FILE"}
-                                        </a>
-                                    </div>
                                 </div>
                             );
                         })}
