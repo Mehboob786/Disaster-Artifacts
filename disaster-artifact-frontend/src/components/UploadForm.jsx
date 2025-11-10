@@ -147,7 +147,6 @@ export default function UploadForm() {
         eventDate: data.eventDate || new Date().toISOString(),
         submitterName: data.submitterName,
         contact: data.contact,
-        tags: data.tags ? data.tags.split(",").map((t) => t.trim()) : [],
         approved: false,
         createdAt: new Date().toISOString(),
       };
@@ -291,16 +290,8 @@ export default function UploadForm() {
           <Form.Group className="mb-3">
             <Form.Control
               type="text"
-              placeholder="Contact Info"
+              placeholder="Enter your contact info (email or phone)"
               {...register("contact")}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-4">
-            <Form.Control
-              type="text"
-              placeholder="Tags (comma separated)"
-              {...register("tags")}
             />
           </Form.Group>
 

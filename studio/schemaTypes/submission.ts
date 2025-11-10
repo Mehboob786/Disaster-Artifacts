@@ -41,7 +41,6 @@ export default defineType({
     { name: 'eventDate', type: 'datetime' },
     { name: 'submitterName', type: 'string' },
     { name: 'contact', type: 'string' },
-    { name: 'tags', type: 'array', of: [{ type: 'string' }] },
     { name: 'approved', type: 'boolean', title: 'Approved', initialValue: false },
     {
       name: 'createdAt',
