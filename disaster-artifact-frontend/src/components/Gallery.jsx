@@ -8,54 +8,103 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [filterDisaster, setFilterDisaster] = useState('all');
+  const [filterSubmitter, setFilterSubmitter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
   const [visibleCount, setVisibleCount] = useState(9);
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const q = `*[_type=="submission" && approved==true] | order(_createdAt desc){
-  _id, title, description, media[]{..., asset->{_id, _type, url, mimeType, extension}}, artifactType, locationName, eventDate, submitterName
-}`;
-    client.fetch(q).then(setItems).catch(console.error).finally(() => setLoading(false));
+      _id, title, description, artifactType, disasterType, locationName,
+      eventDate, submitterName,
+      media[]{..., asset->{_id, _type, url, mimeType, extension}}
+    }`;
+    client.fetch(q)
+      .then(data => setItems(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
-
 
   const filteredItems = items
     .filter(it => {
       const matchesSearch =
         it.title?.toLowerCase().includes(search.toLowerCase()) ||
         it.locationName?.toLowerCase().includes(search.toLowerCase());
-      const matchesType = filterType === 'all' || it.artifactType === filterType;
-      return matchesSearch && matchesType;
+
+      const matchesArtifact = filterType === 'all' || it.artifactType === filterType;
+      const matchesDisaster = filterDisaster === 'all' || it.disasterType === filterDisaster;
+      const matchesSubmitter = filterSubmitter === 'all' || it.submitterName === filterSubmitter;
+
+      return matchesSearch && matchesArtifact && matchesDisaster && matchesSubmitter;
+    })
+    .sort((a, b) => {
+      if (sortOrder === 'newest') return new Date(b.eventDate) - new Date(a.eventDate);
+      if (sortOrder === 'oldest') return new Date(a.eventDate) - new Date(b.eventDate);
+      if (sortOrder === 'titleAZ') return a.title.localeCompare(b.title);
+      if (sortOrder === 'titleZA') return b.title.localeCompare(a.title);
+      return 0;
     })
     .slice(0, visibleCount);
 
-
-
-
-
+  // Dynamic submitter dropdown values
+  const uniqueSubmitters = [...new Set(items.map(i => i.submitterName).filter(Boolean))];
 
   return (
     <div className="container py-5">
       <h2 className="text-center mb-4 fw-bold">🌍 Community Disaster Archive</h2>
 
-      {/* 🔍 Search & Filter Controls */}
-      <Row className="mb-4 justify-content-center">
-        <Col xs={12} md={6} lg={4}>
+      {/* 🔍 Search + Filters */}
+      <Row className="mb-4 g-2 justify-content-center">
+        <Col xs={12} md={5} lg={4}>
           <Form.Control
             type="text"
-            placeholder="Search by title or location..."
+            placeholder="Search title or location..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </Col>
-        <Col xs={12} md={4} lg={3} className="mt-2 mt-md-0">
+
+        <Col xs={12} md={3} lg={2}>
           <Form.Select value={filterType} onChange={e => setFilterType(e.target.value)}>
             <option value="all">All Types</option>
             <option value="image">Images</option>
             <option value="video">Videos</option>
             <option value="document">Documents</option>
+          </Form.Select>
+        </Col>
+
+        <Col xs={12} md={3} lg={2}>
+          <Form.Select value={filterDisaster} onChange={e => setFilterDisaster(e.target.value)}>
+            <option value="all">All Disasters</option>
+            <option value="flood">Flood</option>
+            <option value="earthquake">Earthquake</option>
+            <option value="tornado">Tornado</option>
+            <option value="hurricane_typhoon">Hurricane/Typhoon</option>
+            <option value="wildfire">Wildfire</option>
+            <option value="dust_storm">Dust Storm</option>
+            <option value="freeze">Freeze</option>
+            <option value="severe_storm">Severe Storm</option>
+            <option value="winter_storm">Winter Storm</option>
+          </Form.Select>
+        </Col>
+
+        <Col xs={12} md={3} lg={2}>
+          <Form.Select value={filterSubmitter} onChange={e => setFilterSubmitter(e.target.value)}>
+            <option value="all">All Submitters</option>
+            {uniqueSubmitters.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </Form.Select>
+        </Col>
+
+        <Col xs={12} md={3} lg={2}>
+          <Form.Select value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+            <option value="newest">Newest → Oldest</option>
+            <option value="oldest">Oldest → Newest</option>
+            <option value="titleAZ">Title A → Z</option>
+            <option value="titleZA">Title Z → A</option>
           </Form.Select>
         </Col>
       </Row>
