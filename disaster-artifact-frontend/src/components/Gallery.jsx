@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Button, Spinner, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import client, { urlFor } from '../sanityClient';
+import client from '../sanityClient';
 import getMediaUrl from './utils/getMediaUrl';
 
 export default function Gallery() {
@@ -74,7 +74,6 @@ export default function Gallery() {
             let mediaContent;
             // ...inside component map...
             const media = it.media?.[0]; // primary media
-            const assetDoc = media?.asset; // may include .url, _ref, _id
             const fileUrl = getMediaUrl(media, it.artifactType);
             if (it.artifactType === 'image' && fileUrl) {
               mediaContent = (
