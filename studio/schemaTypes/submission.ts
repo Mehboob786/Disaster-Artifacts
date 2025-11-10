@@ -11,7 +11,10 @@ export default defineType({
       name: 'media',
       title: 'Media',
       type: 'array',
-      of: [{ type: 'file' }],
+      of: [
+        { type: 'image' },
+        { type: 'file' }
+      ],
     },
     { name: 'artifactType', type: 'string' },
 

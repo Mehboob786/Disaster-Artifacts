@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Button, Spinner, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import client, { urlFor } from '../sanityClient';
+import getMediaUrl from './utils/getMediaUrl';
 
 export default function Gallery() {
   const [items, setItems] = useState([]);
@@ -12,15 +13,14 @@ export default function Gallery() {
 
   const navigate = useNavigate();
 
+
   useEffect(() => {
     const q = `*[_type=="submission" && approved==true] | order(_createdAt desc){
-  _id, title, description, media, artifactType, locationName, eventDate,
-  submitterName
+  _id, title, description, media[]{..., asset->{_id, _type, url, mimeType, extension}}, artifactType, locationName, eventDate, submitterName
 }`;
-
-
     client.fetch(q).then(setItems).catch(console.error).finally(() => setLoading(false));
   }, []);
+
 
   const filteredItems = items
     .filter(it => {
@@ -31,6 +31,11 @@ export default function Gallery() {
       return matchesSearch && matchesType;
     })
     .slice(0, visibleCount);
+
+
+
+
+
 
   return (
     <div className="container py-5">
@@ -66,31 +71,48 @@ export default function Gallery() {
       ) : (
         <Row className="justify-content-center">
           {filteredItems.map(it => {
-            const ref = it.media?.asset?._ref;
-            let mediaContent = null;
-            let fileUrl = '';
-
-            if (ref?.startsWith('image-')) {
-              fileUrl = urlFor(it.media.asset).width(600).url();
-              mediaContent = <Card.Img variant="top" src={fileUrl} alt={it.title} />;
-            } else if (it.artifactType === 'video') {
-              const fileId = ref?.replace('file-', '').replace(/-[a-z0-9]+$/, '');
-              fileUrl = `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${fileId}.mp4`;
+            let mediaContent;
+            // ...inside component map...
+            const media = it.media?.[0]; // primary media
+            const assetDoc = media?.asset; // may include .url, _ref, _id
+            const fileUrl = getMediaUrl(media, it.artifactType);
+            if (it.artifactType === 'image' && fileUrl) {
               mediaContent = (
-                <video width="100%" controls className="rounded-top">
+                <Card.Img
+                  variant="top"
+                  src={fileUrl}
+                  alt={it.title}
+                  style={{ height: 200, objectFit: 'cover' }}
+                />
+              );
+            } else if (it.artifactType === 'video' && fileUrl) {
+              mediaContent = (
+                <video width="100%" height="200" controls style={{ objectFit: 'cover' }}>
                   <source src={fileUrl} type="video/mp4" />
                 </video>
               );
-            } else if (ref?.startsWith('file-')) {
-              const ext = ref.split('-').pop();
-              const fileId = ref.replace('file-', '').replace(`-${ext}`, '');
-              fileUrl = `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${fileId}.${ext}`;
+            } else if (it.artifactType === 'document' && fileUrl) {
+              const ext = fileUrl.split('.').pop();
               mediaContent = (
-                <div className="text-center py-5 bg-light rounded-top">
+                <div
+                  className="d-flex flex-column align-items-center justify-content-center bg-light text-muted"
+                  style={{ height: 200 }}
+                >
                   📄 <a href={fileUrl} target="_blank" rel="noopener noreferrer">{ext.toUpperCase()} File</a>
                 </div>
               );
+            } else {
+              mediaContent = (
+                <div
+                  className="d-flex align-items-center justify-content-center bg-light text-muted"
+                  style={{ height: 200 }}
+                >
+                  No Media Available
+                </div>
+              );
             }
+
+
 
             return (
               <Col key={it._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
@@ -108,9 +130,7 @@ export default function Gallery() {
                         : it.description}
                     </Card.Text>
                     <div className="d-flex justify-content-between mt-3">
-                      {it.locationName && (
-                        <small className="text-muted">📍 {it.locationName}</small>
-                      )}
+                      {it.locationName && <small className="text-muted">📍 {it.locationName}</small>}
                       {it.eventDate && (
                         <small className="text-muted">
                           🗓️ {new Date(it.eventDate).toLocaleDateString()}
@@ -120,21 +140,12 @@ export default function Gallery() {
                   </Card.Body>
                   <Card.Footer className="d-flex align-items-center justify-content-between bg-white">
                     <div className="d-flex align-items-center">
-                      {it.submitter?.avatar ? (
-                        <img
-                          src={it.submitter.avatar}
-                          alt={it.submitter.name}
-                          className="rounded-circle me-2"
-                          style={{ width: 32, height: 32, objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div
-                          className="bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
-                          style={{ width: 32, height: 32 }}
-                        >
-                          👤
-                        </div>
-                      )}
+                      <div
+                        className="bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                        style={{ width: 32, height: 32 }}
+                      >
+                        👤
+                      </div>
                       <small className="fw-semibold text-dark">
                         {it.submitterName || 'Anonymous'}
                       </small>
@@ -147,6 +158,7 @@ export default function Gallery() {
               </Col>
             );
           })}
+
         </Row>
       )}
 
