@@ -32,6 +32,50 @@ function MapAutoZoom({ position }) {
   return null;
 }
 
+// 📍 Draggable Marker Component
+function DraggableMarker({ position, setPosition, setValue, setCityName }) {
+  const map = useMap();
+
+  // Initialize marker at current position
+  useEffect(() => {
+    if (position) {
+      map.setView(position, 12);
+    }
+  }, [map, position]);
+
+  const markerRef = React.useRef(null);
+  
+  const eventHandlers = React.useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          const newPosition = marker.getLatLng();
+          setPosition(newPosition);
+          setValue("location", `${newPosition.lat},${newPosition.lng}`);
+          reverseGeocode(newPosition.lat, newPosition.lng, setCityName, setValue);
+        }
+      },
+    }),
+    [setPosition, setValue, setCityName]
+  );
+
+  React.useEffect(() => {
+    if (position && markerRef.current) {
+      markerRef.current.setLatLng(position);
+    }
+  }, [position]);
+
+  return position === null ? null : (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+    />
+  );
+}
+
 // 📍 Handle map click for manual location selection
 function LocationPicker({ setValue, position, setPosition, setCityName }) {
   useMapEvents({
@@ -42,7 +86,7 @@ function LocationPicker({ setValue, position, setPosition, setCityName }) {
       reverseGeocode(latlng.lat, latlng.lng, setCityName, setValue);
     },
   });
-  return position ? <Marker position={position} /> : null;
+  return null; // We're using DraggableMarker instead now
 }
 
 // 🌆 Reverse geocoding helper
@@ -72,7 +116,7 @@ export default function UploadForm() {
   const [position, setPosition] = useState(null);
   const [cityName, setCityName] = useState("Fetching location...");
 
-  // ✅ Get user’s current position on load
+  // ✅ Get user's current position on load
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -86,6 +130,8 @@ export default function UploadForm() {
         (err) => {
           console.warn("Location access denied:", err.message);
           setCityName("Location not available");
+          // Set default position if location access denied
+          setPosition({ lat: 31.5, lng: 74.3 });
         }
       );
     }
@@ -100,7 +146,6 @@ export default function UploadForm() {
       const mediaRefs = [];
 
       for (const file of files) {
-
         const asset = await client.assets.upload("file", file, {
           filename: file.name,
         });
@@ -141,9 +186,9 @@ export default function UploadForm() {
         locationName: data.locationName || cityName,
         location: data.location
           ? {
-            lat: parseFloat(data.location.split(",")[0]),
-            lng: parseFloat(data.location.split(",")[1]),
-          }
+              lat: parseFloat(data.location.split(",")[0]),
+              lng: parseFloat(data.location.split(",")[1]),
+            }
           : undefined,
         eventDate: data.eventDate || new Date().toISOString(),
         submitterName: data.submitterName,
@@ -156,6 +201,7 @@ export default function UploadForm() {
       alert("✅ Submission successful — pending admin approval.");
       reset();
       setCityName("Fetching location...");
+      setPosition(null);
     } catch (e) {
       console.error(e);
       alert("❌ Upload failed: " + e.message);
@@ -235,6 +281,13 @@ export default function UploadForm() {
           <Form.Label className="fw-semibold mt-3">
             📍 Pick or Confirm Location
           </Form.Label>
+          <div className="mb-2">
+            <small className="text-muted">
+              • Click anywhere on the map to place a pin
+              <br />
+              • Drag the pin to adjust the location precisely
+            </small>
+          </div>
           <div className="mb-3 rounded overflow-hidden border border-light">
             <MapContainer
               center={position || [31.5, 74.3]}
@@ -248,6 +301,12 @@ export default function UploadForm() {
                 setPosition={setPosition}
                 setCityName={setCityName}
               />
+              <DraggableMarker
+                position={position}
+                setPosition={setPosition}
+                setValue={setValue}
+                setCityName={setCityName}
+              />
               <MapAutoZoom position={position} />
             </MapContainer>
           </div>
@@ -258,7 +317,7 @@ export default function UploadForm() {
               placeholder="Latitude, Longitude"
               {...register("location")}
               readOnly
-              value={position ? `${position.lat},${position.lng}` : ""}
+              value={position ? `${position.lat.toFixed(6)},${position.lng.toFixed(6)}` : ""}
             />
           </Form.Group>
 
