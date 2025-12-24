@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Spinner, Form, Row, Col } from 'react-bootstrap';
+import { Card, Button, Spinner, Form, Row, Col, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import client from '../sanityClient';
 
@@ -12,6 +12,7 @@ export default function Gallery() {
   const [filterSubmitter, setFilterSubmitter] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
   const [visibleCount, setVisibleCount] = useState(9);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   const navigate = useNavigate();
 
@@ -25,6 +26,13 @@ export default function Gallery() {
       .then(data => setItems(data))
       .catch(console.error)
       .finally(() => setLoading(false));
+    
+    // Show modal every time
+    const timer = setTimeout(() => {
+      setShowWelcome(true);
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const filteredItems = items
@@ -53,6 +61,36 @@ export default function Gallery() {
 
   return (
     <div className="container py-5">
+      {/* Updated Welcome Modal */}
+      <Modal show={showWelcome} onHide={() => setShowWelcome(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Welcome to the Community Disaster Archive! 🌍</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="alert alert-warning mb-3">
+            <strong>Important Notice:</strong> You may not be able to add new submissions because the Sanity (backend) trial has ended. However, you can explore and navigate through all existing artifacts in this application.
+          </div>
+          
+          <p>I am in communication with Professor Christina Boyles to resolve this issue as soon as possible.</p>
+          
+          <p><strong>What you can do right now:</strong></p>
+          <ul>
+            <li>Browse all existing disaster artifacts</li>
+            <li>Filter by artifact type, disaster type, or submitter</li>
+            <li>Search by title or location</li>
+            <li>Sort by date or title</li>
+            <li>Click any card to view detailed information</li>
+          </ul>
+          
+          <p className="mb-0">Thank you for your patience while we work to restore full functionality.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowWelcome(false)}>
+            Start Exploring
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <h2 className="text-center mb-4 fw-bold">🌍 Community Disaster Archive</h2>
 
       {/* 🔍 Search + Filters */}
@@ -155,9 +193,6 @@ export default function Gallery() {
               );
             }
 
-
-
-
             return (
               <Col key={it._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
                 <Card
@@ -202,10 +237,8 @@ export default function Gallery() {
               </Col>
             );
           })}
-
         </Row>
       )}
-
 
       {/* 📜 Load More Button */}
       {visibleCount < items.length && (
